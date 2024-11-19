@@ -18,7 +18,7 @@ class LogisticRegression:
         ##############################
         preds = sigmoid(np.dot(x, self.parameters))
         ##############################
-        #Here we return the predictions of the input features
+        
         return preds
     
     
