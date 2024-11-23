@@ -1,0 +1,41 @@
+# Define transformations for the data that we will use
+transform = transforms.Compose([
+    transforms.ToTensor(),
+])
+
+# Load the CIFAR-10 dataset
+full_train_dataset = datasets.CIFAR10(root='./data', train=True, download=True, transform=transform)
+test_dataset = datasets.CIFAR10(root='./data', train=False, download=True, transform=transform)
+
+#####################################################
+train_size = int(0.8 * len(full_train_dataset))  # 80% for training
+val_size = len(full_train_dataset) - train_size   # 20% for validation
+
+# Create training and validation splits
+train_dataset, val_dataset = random_split(full_train_dataset, [train_size, val_size],generator=torch.Generator().manual_seed(42))  # For reproducibility
+train_loader = DataLoader(
+    train_dataset,
+    batch_size=64,
+    shuffle=True,  # Shuffle training data
+    num_workers=2  # for faster data loading
+)
+
+val_loader = DataLoader(
+    val_dataset,
+    batch_size=64,
+    shuffle=False,  # No need to shuffle
+    num_workers=2   #for faster data loading
+)
+
+test_loader = DataLoader(
+    test_dataset,
+    batch_size=64,
+    shuffle=False,  # No need 
+    num_workers=2   # for faster data loading
+)
+#####################################################
+
+print(f"Full training dataset size: {len(full_train_dataset)}")
+print(f"Training set size: {len(train_dataset)}")
+print(f"Validation set size: {len(val_dataset)}")
+print(f"Test set size: {len(test_dataset)}")
