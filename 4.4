@@ -1,0 +1,19 @@
+correct = 0
+total = 0
+with torch.no_grad():
+    for data in test_loader:
+        images, labels = data
+        outputs = net(images)
+        _, predicted = torch.max(outputs.data, 1)
+        #####################################################
+        ##              YOUR CODE HERE                     ##
+        #####################################################
+
+        total += labels.size(0)  #we add the number of immages in the current batch 
+        correct += (predicted == labels).sum().item()  # Count correct predictions
+
+        #####################################################
+        ##              END OF YOUR CODE                   ##
+        #####################################################
+
+print(f'Accuracy on the test images: {100 * correct / total:.2f}%')
