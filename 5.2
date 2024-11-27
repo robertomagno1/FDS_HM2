@@ -1,0 +1,41 @@
+#####################################################
+##              YOUR CODE HERE                     ##
+#####################################################
+class ModifiedAlexNet(nn.Module):
+    def __init__(self, num_classes=10):
+        super(ModifiedAlexNet, self).__init__()
+        
+        # 1. Load pre-trained AlexNet from torchvision
+        # Specify pretrained=True to load ImageNet weights
+        self.alexnet = models.alexnet(pretrained=True)
+        
+        # 2. Freeze all existing layers
+        for param in self.alexnet.parameters():
+            param.requires_grad = False
+        
+        # 3. Modify the classifier (final layers)
+        # Create a new classifier
+        self.modified_classifier = nn.Sequential(
+            # Keep the first two linear layers the same
+            self.alexnet.classifier[0],
+            self.alexnet.classifier[1],
+            # Replace the last layer to output num_classes
+            nn.Linear(4096, num_classes)
+        )
+        
+        # Replace the original classifier with the modified one
+        self.alexnet.classifier = self.modified_classifier
+
+        for param in self.alexnet.classifier.parameters():
+            param.requires_grad = True
+
+    def forward(self, x):
+        # Forward pass through the modified AlexNet
+        return self.alexnet(x)
+
+
+#####################################################
+##              END OF YOUR CODE                   ##
+#####################################################
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+model = ModifiedAlexNet(num_classes=10).to(device)
