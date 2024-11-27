@@ -1,0 +1,104 @@
+# Initialize lists to store metrics
+train_losses = []
+val_losses = []
+train_accuracies = []
+val_accuracies = []
+
+
+num_epochs = 10
+# Training loop
+for epoch in range(num_epochs):
+    running_loss = 0.0
+    total_batches = 0
+
+    # Training Phase
+    net.train()
+    for i, data in enumerate(train_loader, 0):
+        inputs, labels = data
+
+        # Zero the parameter gradients
+        optimizer.zero_grad()
+
+        # Forward pass
+        outputs = net(inputs)
+
+        # Compute loss
+        loss = criterion(outputs, labels)
+
+        # Backward pass and optimization
+        loss.backward()
+        optimizer.step()
+
+        running_loss += loss.item()
+        total_batches += 1
+
+    #####################################################
+    ##              YOUR CODE HERE                     ##
+    #####################################################
+    
+    # Calculate average loss for the training epoch
+    avg_train_loss = running_loss/total_batches
+    train_losses.append(avg_train_loss)
+
+    # Calculate training accuracy
+
+    total_train = 0
+    correct_train = 0
+    for inputs, labels in train_loader:
+        outputs = net(inputs)
+        y_pred = torch.max(outputs, 1)[1]
+        total_train += labels.size(0)
+        correct_train += (y_pred == labels).sum().item()
+    train_accuracy = correct_train / total_train
+    #y_pred = torch.max(outputs, 1)[1]  # Gets the index of the highest value
+    #train_accuracy = (y_pred == labels).float().mean().item()  # Converts True/False to 1.0/0.0, calculates (correct predictons/total), then converts the value of the tensor to a number.
+    #train_accuracies.append(train_accuracy)
+
+    #####################################################
+    ##              END OF YOUR CODE                   ##
+    #####################################################
+
+    print(f'Epoch {epoch + 1}, Average Training Loss: {avg_train_loss:.4f}, Training Accuracy: {train_accuracy:.4f}')
+
+    # Validation Phase
+    net.eval()
+    val_running_loss = 0.0
+    correct = 0
+    total = 0
+
+    with torch.no_grad():
+        for val_data in val_loader:
+            val_inputs, val_labels = val_data
+
+            # Forward pass
+            val_outputs = net(val_inputs)
+
+            # Compute loss
+            val_loss = criterion(val_outputs, val_labels)
+            val_running_loss += val_loss.item()
+
+            # Calculate accuracy
+            _, val_predicted = torch.max(val_outputs.data, 1)
+            total += val_labels.size(0)
+            correct += (val_predicted == val_labels).sum().item()
+
+
+    #####################################################
+    ##              YOUR CODE HERE                     ##
+    #####################################################
+
+    # Calculate average loss for the validation epoch
+    avg_val_loss = val_running_loss / len(val_loader)
+    val_losses.append(avg_val_loss)
+
+    # Calculate validation accuracy
+    val_accuracy = correct / total 
+    val_accuracies.append(val_accuracy)
+
+    #####################################################
+    ##              END OF YOUR CODE                   ##
+    #####################################################
+
+    print(f'Epoch {epoch + 1}, Average Validation Loss: {avg_val_loss:.4f}, Validation Accuracy: {val_accuracy:.4f}')
+
+print('Finished Training')
